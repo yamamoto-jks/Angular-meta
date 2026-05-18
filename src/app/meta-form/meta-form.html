@@ -1,0 +1,34 @@
+<form (submit)="onSubmit()">
+  @for (field of metaFormFields; track field.key) {
+    <mat-form-field class="example-full-width">
+      <mat-label>{{ field.label }}</mat-label>
+      @switch (field.controlType) {
+        @case ('text') {
+          <input
+            [name]="field.key"
+            matInput
+            [placeholder]="field.placeholder ?? ''"
+            [ngModel]="values()[field.key]"
+            (ngModelChange)="updateValue(field.key, $event)"
+          />
+        }
+        @case ('select') {
+          <mat-select
+            [ngModel]="values()[field.key]"
+            (ngModelChange)="updateValue(field.key, $event)"
+            [name]="field.key"
+          >
+            @for (option of field.options; track option.value) {
+              <mat-option [value]="option.value">{{ option.label }}</mat-option>
+            }
+          </mat-select>
+        }
+      }
+      @if (errors()[field.key]; as error) {
+        <mat-hint class="error">{{ error }}</mat-hint>
+      }
+    </mat-form-field>
+  }
+
+  <button matButton="filled" type="submit">送信</button>
+</form>
