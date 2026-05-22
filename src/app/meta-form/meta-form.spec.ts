@@ -5,11 +5,11 @@ import { By } from '@angular/platform-browser';
 import { MatOption } from '@angular/material/select';
 
 describe('MetaForm - メタデータに基づいたUI表示', () => {
-  const setupComponentsWith = async (meta: MetaFormField[]) => {
-    await TestBed.configureTestingModule({
+  const setupComponentsWith = (meta: MetaFormField[]) => {
+    TestBed.configureTestingModule({
       imports: [MetaForm],
       providers: [{ provide: META_FORM_FIELDS_TOKEN, useValue: meta }],
-    }).compileComponents();
+    });
 
     const fixture = TestBed.createComponent(MetaForm);
     const { debugElement } = fixture;
@@ -21,8 +21,8 @@ describe('MetaForm - メタデータに基づいたUI表示', () => {
   };
 
   // TODO: テストケース分割
-  test('メタデータに基づき、input, selectのどちらも描画されること', async () => {
-    const { fixture, debugElement } = await setupComponentsWith([
+  test('メタデータに基づき、input, selectのどちらも描画されること', () => {
+    const { fixture, debugElement } = setupComponentsWith([
       {
         controlType: 'text',
         label: 'テスト入力',
