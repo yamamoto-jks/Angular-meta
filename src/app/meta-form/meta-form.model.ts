@@ -13,14 +13,17 @@ const InputFieldSchema = FormFieldSchemaBase.extend({
 
 const SelectFieldSchema = FormFieldSchemaBase.extend({
   controlType: literal('select'),
-  options: z.array(
-    z
-      .strictObject({
-        value: z.string().min(1),
-        label: z.string().min(1),
-      })
-      .readonly(),
-  ),
+  options: z
+    .array(
+      z
+        .strictObject({
+          value: z.string().min(1),
+          label: z.string().min(1),
+        })
+        .readonly(),
+    )
+    .nonempty()
+    .readonly(),
 }).readonly();
 
 const formFieldSchema = z.discriminatedUnion('controlType', [InputFieldSchema, SelectFieldSchema]);
