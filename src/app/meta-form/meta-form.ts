@@ -2,7 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { META_FORM_FIELDS, META_FORM_FIELDS_TOKEN, MetaFormField } from './meta-form.model';
+import { META_FORM_FIELDS_TOKEN, MetaFormField } from './meta-form.model';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 
@@ -11,7 +11,6 @@ import { MatButtonModule } from '@angular/material/button';
   imports: [MatFormFieldModule, FormsModule, MatInputModule, MatSelectModule, MatButtonModule],
   templateUrl: './meta-form.html',
   styleUrl: './meta-form.scss',
-  providers: [{ provide: META_FORM_FIELDS_TOKEN, useValue: META_FORM_FIELDS }],
 })
 export class MetaForm {
   readonly metaFormFields = inject<MetaFormField[]>(META_FORM_FIELDS_TOKEN);
