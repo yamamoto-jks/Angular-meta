@@ -1,59 +1,50 @@
-# MetaUi
+# 自己学習用：動的フォーム生成（Meta UI）
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.11.
+## 詳細設計（フロントエンドのみ）
 
-## Development server
+### 1. DB・データモデル設計
 
-To start a local development server, run:
+- **MetaFormFieldsTable**
+  - `FormId`: string (PartitionKey) - フォームの識別子（例: 'USER_PROFILE' > プロフィール入力フォーム）
+  - `fields`: MetaFormField[] - フォームを構成する項目の配列
+- **MetaFormField (Zod Schema / TS Type)**
+  - `key`: string (一意の識別子、定数値のマジックストリング排除のため `as const` 定義を推奨)
+  - `label`: string (画面表示名)
+  - `controlType`: 'text' | 'select'
+  - `options`?: { value: string, label: string }[] (select時のみ必須)
 
-```bash
-ng serve
-```
+---
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+### 2. コンポーネント設計 (meta-form)
 
-## Code scaffolding
+- **ロジック (ts)**
+  - `withComponentInputBinding` を経由して、RouterData から `fields` (メタデータ) を `@Input` としてインジェクトする。
+  - Angular **Reactive Forms** (`FormGroup`, `FormControl`) を用い、`fields` の内容から動的にフォームコントロールを生成する。
+  - フォーム全体の入力値は `{ [key: string]: string }` のディクショナリ形式でリアルタイムに管理・更新する。
+  - 項目が0個の場合は、コンポーネント初期化時（`ngOnInit`）に `window.alert('表示するフォーム項目がありません。')` を実行し処理を中断する。
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+- **テンプレート (html)**
+  - `@for` ディレクティブで `fields` をループ処理する。
+  - `@if` ディレクティブを用い、`controlType` に応じて **Angular Material** コンポーネントを以下ルールで動的に切り替える。
 
-```bash
-ng generate component component-name
-```
+    #### 【UIコンポーネントマッピングルール】
+    - **`controlType === 'text'`**
+      - 適用コンポーネント: `<mat-form-field>` + `<input matInput>`
+    - **`controlType === 'select'`**
+      - 適用コンポーネント: `<mat-form-field>` + `<mat-select>` + `<mat-option>`
+      - ※ `field.options` をさらに内部で `@for` ループさせて選択肢を展開する。
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+---
 
-```bash
-ng generate --help
-```
+### 3. テスト仕様 (meta-form.component.spec.ts)
 
-## Building
+設計の正しさを担保するため、以下の受け入れ基準に基づく単体テスト（Jasmine/Jest）を実装する。
 
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- **正常系テスト**
+  - `text` が渡された際、画面上に `<input matInput>` が正しく1つ描画されること。
+  - `select` と `options` が渡された際、画面上に `<mat-select>` が描画され、クリック時に選択肢が展開されること。
+  - `text` と `select` が混在したメタデータでも、崩れることなく指定順通りに表示されること。
+  - どちらか片方（例: `text` のみ）のデータであってもクラッシュせず正しく表示されること。
+- **異常系テスト**
+  - `fields` 配列の要素数が0（または空）のとき、画面描画をスキップし `window.alert` が1回呼び出されること。
+  - `controlType: 'select'` にもかかわらず `options` が `undefined` で届いた場合、システムがクラッシュせず安全に（空のセレクトボックスとして）耐えられること。
