@@ -1,5 +1,5 @@
 <form (submit)="onSubmit()">
-  @for (field of metaFormFields; track field.key) {
+  @for (field of metaFormFields(); track field.key) {
     <mat-form-field class="example-full-width" [id]="field.key + '-field'">
       <mat-label>{{ field.label }}</mat-label>
       @switch (field.controlType) {

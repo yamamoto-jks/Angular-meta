@@ -1,0 +1,7 @@
+{
+  "/2015-03-31": {
+    "target": "http://localhost:9000",
+    "secure": false,
+    "changeOrigin": true
+  }
+}
