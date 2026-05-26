@@ -1,14 +1,20 @@
 import { TestBed } from '@angular/core/testing';
 import { MetaForm } from './meta-form';
-import { META_FORM_FIELDS_TOKEN, MetaFormField } from './meta-form.model';
-import { By } from '@angular/platform-browser';
+import { HttpClient, META_HTTP_CLIENT_TOKEN } from './http/HttpClient';
+import { of } from 'rxjs';
+import { MetaFormField } from './meta-form.model';
 import { MatOption } from '@angular/material/select';
+import { By } from '@angular/platform-browser';
 
-describe('MetaForm - メタデータに基づいたUI表示', () => {
+describe('MetaForm (結合テスト)', () => {
   const setupComponentsWith = (meta: MetaFormField[]) => {
+    const mockClient: HttpClient = {
+      getFormMetadata: () => of(meta),
+    };
+
     TestBed.configureTestingModule({
       imports: [MetaForm],
-      providers: [{ provide: META_FORM_FIELDS_TOKEN, useValue: meta }],
+      providers: [{ provide: META_HTTP_CLIENT_TOKEN, useValue: mockClient }],
     });
 
     const fixture = TestBed.createComponent(MetaForm);
@@ -27,6 +33,7 @@ describe('MetaForm - メタデータに基づいたUI表示', () => {
         controlType: 'text',
         label: 'テスト入力',
         key: 'test-text',
+        placeholder: 'テストプレースホルダ',
       },
       {
         controlType: 'select',
@@ -51,10 +58,11 @@ describe('MetaForm - メタデータに基づいたUI表示', () => {
     expect(formFields.length).toBe(2);
 
     const [inputField, selectField] = formFields;
-    const input = inputField.query(By.css('input[mat-input]'));
+    const input = inputField.query(By.css('input[matInput]'));
     const select = selectField.query(By.css('mat-select'));
-    expect(input).toBeDefined();
-    expect(select).toBeDefined();
+    expect(input).toBeTruthy();
+    expect((input.nativeElement as HTMLInputElement).placeholder).toBe('テストプレースホルダ');
+    expect(select).toBeTruthy();
 
     const inputLabel = inputField.query(By.css('mat-label'));
     const selectLabel = selectField.query(By.css('mat-label'));

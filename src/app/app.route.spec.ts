@@ -4,11 +4,23 @@ import { routes } from './app.routes';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { MetaForm } from './meta-form/meta-form';
 import { NotFound } from './not-found/not-found';
+import { HttpClient, META_HTTP_CLIENT_TOKEN } from './meta-form/http/HttpClient';
+import { of } from 'rxjs';
 
 describe('ルーティング', () => {
   beforeEach(() => {
+    const mockMetaHttpClient: HttpClient = {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      getFormMetadata(_formId) {
+        return of([]);
+      },
+    };
+
     TestBed.configureTestingModule({
-      providers: [provideRouter(routes)],
+      providers: [
+        provideRouter(routes),
+        { provide: META_HTTP_CLIENT_TOKEN, useValue: mockMetaHttpClient },
+      ],
     });
   });
 

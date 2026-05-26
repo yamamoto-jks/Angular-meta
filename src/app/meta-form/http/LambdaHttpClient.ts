@@ -1,9 +1,10 @@
 import { inject } from '@angular/core';
 import { formFieldSchema, MetaFormField } from '../meta-form.model';
-import { FormId, HttpClient as MetaformHttpClient } from './HttpClient';
+import { FormId, formIdSchema, HttpClient as MetaformHttpClient } from './HttpClient';
 import { HttpClient } from '@angular/common/http';
 import z from 'zod';
 import { map, Observable } from 'rxjs';
+import { InvalidStatusCodeException } from './exceptions/InvalidStatusCodeException';
 
 const LambdaRawResponseSchema = z.object({
   statusCode: z.number(),
@@ -11,12 +12,18 @@ const LambdaRawResponseSchema = z.object({
 });
 
 const DynamoDbItemSchema = z.strictObject({
-  formId: z.string(),
+  formId: formIdSchema,
   fields: z.array(formFieldSchema),
 });
 
 const runtimeResponseToFormFields = (raw: unknown): MetaFormField[] => {
   const validatedResponse = LambdaRawResponseSchema.parse(raw);
+  if (validatedResponse.statusCode < 200 || 300 <= validatedResponse.statusCode) {
+    throw new InvalidStatusCodeException(
+      `失敗ステータスが返却されました。 > ${validatedResponse.statusCode}`,
+    );
+  }
+
   const parsedBody = JSON.parse(validatedResponse.body);
   const validatedData = DynamoDbItemSchema.parse(parsedBody);
   return validatedData.fields;
