@@ -2,12 +2,22 @@ import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, GetCommand } from '@aws-sdk/lib-dynamodb';
 import { APIGatewayProxyHandler } from 'aws-lambda';
 
-const dynamoDBDocumentClient = DynamoDBDocumentClient.from(
-  new DynamoDBClient({
-    endpoint: process.env.DYNAMODB_ENDPOINT,
-    credentials: { accessKeyId: 'local', secretAccessKey: 'local' },
-  }),
-);
+const clientConfig: {
+  endpoint?: string;
+  credentials?: {
+    accessKeyId: 'local';
+    secretAccessKey: 'local';
+  };
+} = {
+  endpoint: process.env.DYNAMODB_ENDPOINT,
+};
+if (process.env.ENV_TYPE === 'LOCAL') {
+  clientConfig['credentials'] = {
+    accessKeyId: 'local',
+    secretAccessKey: 'local',
+  };
+}
+const dynamoDBDocumentClient = DynamoDBDocumentClient.from(new DynamoDBClient(clientConfig));
 
 export const handler: APIGatewayProxyHandler = async (event) => {
   const headers = {

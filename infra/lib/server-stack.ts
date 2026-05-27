@@ -23,6 +23,7 @@ export class ServerStack extends cdk.Stack {
       environment: {
         TABLE_NAME: table.tableName,
         ALLOWED_ORIGIN: process.env.ALLOWED_ORIGIN ?? '*',
+        ENV_TYPE: process.env.ENV_TYPE ?? 'PROD',
       },
     });
 

@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import z from 'zod';
 import { map, Observable } from 'rxjs';
 import { InvalidStatusCodeException } from './exceptions/InvalidStatusCodeException';
+import { environment } from '../../../environments/environment';
 
 const LambdaRawResponseSchema = z.object({
   statusCode: z.number(),
@@ -30,14 +31,27 @@ const runtimeResponseToFormFields = (raw: unknown): MetaFormField[] => {
 };
 
 export class LambdaHttpClient implements MetaformHttpClient {
-  private static readonly API_URL = '/2015-03-31/functions/function/invocations';
   private readonly http = inject(HttpClient);
 
   getFormMetadata(formId: FormId): Observable<MetaFormField[]> {
+    return environment.production
+      ? this.getFromMetadataInProd(formId)
+      : this.getFromMetadataInLocal(formId);
+  }
+
+  private getFromMetadataInLocal(formId: FormId): Observable<MetaFormField[]> {
     return this.http
-      .post(LambdaHttpClient.API_URL, {
+      .post('/2015-03-31/functions/function/invocations', {
         queryStringParameters: { formId },
       })
       .pipe(map((raw) => runtimeResponseToFormFields(raw)));
+  }
+
+  private getFromMetadataInProd(formId: FormId): Observable<MetaFormField[]> {
+    return this.http
+      .get(
+        `https://bxfjpizdji.execute-api.ap-northeast-1.amazonaws.com/prod/metadata?formId=${formId}`,
+      )
+      .pipe(map((raw) => DynamoDbItemSchema.parse(raw)['fields']));
   }
 }
