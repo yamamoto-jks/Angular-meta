@@ -12,8 +12,8 @@ export const handler: APIGatewayProxyHandler = async (event) => {
   };
 
   try {
-    const rawAnswers = event.queryStringParameters?.answers;
-    if (!rawAnswers) {
+    const { body } = event;
+    if (!body) {
       return {
         statusCode: 400,
         headers,
@@ -21,7 +21,12 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       };
     }
 
-    const validatedAnswers = AnswersSchema.parse(JSON.parse(rawAnswers));
+    let parsed: object = JSON.parse(body);
+    if ('body' in parsed && typeof parsed.body === 'string') {
+      parsed = JSON.parse(parsed.body);
+    }
+
+    const validatedAnswers = AnswersSchema.parse(parsed);
     const id = crypto.randomUUID();
 
     const command = new PutCommand({

@@ -16,7 +16,6 @@ export class SaveAnswerService extends Construct {
     super(scope, id);
 
     const table = new Table(this, 'AnswersTable', {
-      tableName: 'AnswersTable',
       partitionKey: { name: 'id', type: AttributeType.STRING },
       billingMode: BillingMode.PAY_PER_REQUEST,
       removalPolicy: RemovalPolicy.DESTROY,

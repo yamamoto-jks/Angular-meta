@@ -49,7 +49,7 @@ export class ClientStack extends Stack {
     });
 
     new BucketDeployment(this, 'DeployMetaUi', {
-      sources: [Source.asset(path.join(__dirname, '../../dist/meta_ui/browser'))],
+      sources: [Source.asset(path.join(__dirname, '../../../dist/meta_ui/browser'))],
       destinationBucket: websiteBucket,
       distribution,
       distributionPaths: ['/*'],

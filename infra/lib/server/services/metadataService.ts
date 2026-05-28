@@ -15,7 +15,6 @@ export class MetadataService extends Construct {
   ) {
     super(scope, id);
     const table = new Table(this, 'FormMetadataTable', {
-      tableName: process.env.TABLE_NAME ?? 'MetaFormFieldsTable',
       partitionKey: { name: 'formId', type: AttributeType.STRING },
       billingMode: BillingMode.PAY_PER_REQUEST,
       removalPolicy: RemovalPolicy.DESTROY,

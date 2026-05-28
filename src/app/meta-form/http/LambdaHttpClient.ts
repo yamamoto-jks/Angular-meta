@@ -48,7 +48,7 @@ export class LambdaHttpClient implements MetaformHttpClient {
   private submitOnLocal(keyAndValues: Record<MetaFormField['key'], string>) {
     this.http
       .post(`${LambdaHttpClient.API_URL.LOCAL}/save-answer`, {
-        queryStringParameters: { answers: JSON.stringify(keyAndValues) },
+        body: JSON.stringify(keyAndValues),
       })
       .subscribe();
   }
@@ -56,7 +56,7 @@ export class LambdaHttpClient implements MetaformHttpClient {
   private submitOnProd(keyAndValues: Record<MetaFormField['key'], string>) {
     this.http
       .post(`${LambdaHttpClient.API_URL.PROD}/answer`, {
-        queryStringParameters: { answers: JSON.stringify(keyAndValues) },
+        body: JSON.stringify(keyAndValues),
       })
       .subscribe();
   }
