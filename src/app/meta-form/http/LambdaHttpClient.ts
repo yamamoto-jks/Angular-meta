@@ -31,11 +31,31 @@ const runtimeResponseToFormFields = (raw: unknown): MetaFormField[] => {
 };
 
 export class LambdaHttpClient implements MetaformHttpClient {
+  private static readonly API_URL = {
+    LOCAL: '/lambda',
+    PROD: 'https://bxfjpizdji.execute-api.ap-northeast-1.amazonaws.com/prod',
+  } as const;
   private readonly http = inject(HttpClient);
 
   submit(keyAndValues: Record<MetaFormField['key'], string>) {
+    if (environment.production) {
+      this.submitOnProd(keyAndValues);
+    } else {
+      this.submitOnLocal(keyAndValues);
+    }
+  }
+
+  private submitOnLocal(keyAndValues: Record<MetaFormField['key'], string>) {
     this.http
-      .post('/2015-03-31/functions/save-answer/invocations', {
+      .post(`${LambdaHttpClient.API_URL.LOCAL}/save-answer`, {
+        queryStringParameters: { answers: JSON.stringify(keyAndValues) },
+      })
+      .subscribe();
+  }
+
+  private submitOnProd(keyAndValues: Record<MetaFormField['key'], string>) {
+    this.http
+      .post(`${LambdaHttpClient.API_URL.PROD}/answer`, {
         queryStringParameters: { answers: JSON.stringify(keyAndValues) },
       })
       .subscribe();
@@ -49,7 +69,7 @@ export class LambdaHttpClient implements MetaformHttpClient {
 
   private getFromMetadataInLocal(formId: FormId): Observable<MetaFormField[]> {
     return this.http
-      .post('/2015-03-31/functions/get-metadata/invocations', {
+      .post(`${LambdaHttpClient.API_URL.LOCAL}/get-metadata`, {
         queryStringParameters: { formId },
       })
       .pipe(map((raw) => runtimeResponseToFormFields(raw)));
@@ -57,9 +77,7 @@ export class LambdaHttpClient implements MetaformHttpClient {
 
   private getFromMetadataInProd(formId: FormId): Observable<MetaFormField[]> {
     return this.http
-      .get(
-        `https://bxfjpizdji.execute-api.ap-northeast-1.amazonaws.com/prod/metadata?formId=${formId}`,
-      )
+      .get(`${LambdaHttpClient.API_URL.PROD}/metadata?formId=${formId}`)
       .pipe(map((raw) => DynamoDbItemSchema.parse(raw)['fields']));
   }
 }

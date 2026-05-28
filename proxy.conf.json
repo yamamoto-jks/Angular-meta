@@ -1,16 +1,16 @@
 {
-  "/2015-03-31/functions/get-metadata/invocations": {
+  "/lambda/get-metadata": {
     "target": "http://localhost:9000",
     "secure": false,
     "pathRewrite": {
-      "^/2015-03-31/functions/get-metadata/invocations": "/2015-03-31/functions/function/invocations"
+      "^/lambda/get-metadata": "/2015-03-31/functions/function/invocations"
     }
   },
-  "/2015-03-31/functions/save-answer/invocations": {
+  "/lambda/save-answer": {
     "target": "http://localhost:9001",
     "secure": false,
     "pathRewrite": {
-      "^/2015-03-31/functions/save-answer/invocations": "/2015-03-31/functions/function/invocations"
+      "^/lambda/save-answer": "/2015-03-31/functions/function/invocations"
     }
   }
 }
