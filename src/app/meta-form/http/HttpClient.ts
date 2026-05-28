@@ -9,4 +9,5 @@ export const META_HTTP_CLIENT_TOKEN = new InjectionToken<HttpClient[]>('META_HTT
 
 export interface HttpClient {
   getFormMetadata(formId: FormId): Observable<MetaFormField[]>;
+  submit(keyAndValues: Record<MetaFormField['key'], string>): void;
 }

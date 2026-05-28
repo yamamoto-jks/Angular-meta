@@ -1,5 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, META_HTTP_CLIENT_TOKEN } from './http/HttpClient';
+import { MetaFormField } from './meta-form.model';
 
 @Injectable({ providedIn: 'root' })
 export class MetaFormService {
@@ -7,5 +8,9 @@ export class MetaFormService {
 
   getFormMetadata() {
     return this.http.getFormMetadata('user_profile');
+  }
+
+  submit(keyAndValues: Record<MetaFormField['key'], string>) {
+    return this.http.submit(keyAndValues);
   }
 }

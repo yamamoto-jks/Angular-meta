@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import * as cdk from 'aws-cdk-lib/core';
-import { ServerStack } from '../lib/server-stack';
-import { ClientStack } from '../lib/client-stack';
+import { ServerStack } from '../lib/server/server-stack';
+import { ClientStack } from '../lib/client/client-stack';
 import { Construct } from 'constructs';
 
 const app = new cdk.App();

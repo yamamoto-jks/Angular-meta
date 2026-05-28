@@ -66,12 +66,12 @@ describe('AWS Lambda経由のフォームのメタデータ取得', () => {
         next: (fields) => {
           expect(fields.length).toBe(2);
           const [firstField, secondField] = fields;
-          expect(firstField.key).toBe('name');
-          expect(secondField.key).toBe('bloodType');
-          if (secondField.controlType !== 'select') {
+          expect(firstField?.key).toBe('name');
+          expect(secondField?.key).toBe('bloodType');
+          if (secondField?.controlType !== 'select') {
             throw new Error();
           }
-          expect(secondField.options.length).toBe(4);
+          expect(secondField?.options?.length).toBe(4);
         },
       });
 

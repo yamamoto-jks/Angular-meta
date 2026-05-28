@@ -6,10 +6,13 @@
     "watch": "tsc -w",
     "test": "jest",
     "cdk": "cdk",
-    "build:lambda": "npx esbuild src/lambda/get-metadata.ts --bundle --platform=node --target=node24 --outfile=dist/lambda/get-metadata.js",
+    "build:get-metadata-lambda": "npx esbuild src/lambda/get-metadata.ts --bundle --platform=node --target=node24 --outfile=dist/lambda/get-metadata.js",
+    "build:save-answer-lambda": "npx esbuild src/lambda/save-answer.ts --bundle --platform=node --target=node24 --outfile=dist/lambda/save-answer.js",
+    "build:lambda": "npm run build:get-metadata-lambda && npm run build:save-answer-lambda",
     "local:up": "npm run build:lambda && docker compose up -d",
     "local:down": "docker compose down && rm -rf dist",
-    "local:restart": "npm run local:down && npm run local:up"
+    "local:restart": "npm run local:down && npm run local:up",
+    "prod:deploy": "CDK_DEFAULT_ACCOUNT=078001352657 CDK_DEFAULT_REGION=ap-northeast-1 npx cdk deploy ServerStack"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.161",
@@ -26,6 +29,7 @@
     "@aws-sdk/client-dynamodb": "^3.1052.0",
     "@aws-sdk/lib-dynamodb": "^3.1052.0",
     "aws-cdk-lib": "^2.255.0",
-    "constructs": "^10.5.0"
+    "constructs": "^10.5.0",
+    "zod": "^4.4.3"
   }
 }

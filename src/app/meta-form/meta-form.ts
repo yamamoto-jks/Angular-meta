@@ -52,7 +52,7 @@ export class MetaForm {
       return;
     }
 
-    console.log('送信', this.values());
+    this.metaFormService.submit(this.values());
   }
 
   updateValue(key: string, newValue: string) {

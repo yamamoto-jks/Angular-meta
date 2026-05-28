@@ -1,7 +1,16 @@
 {
-  "/2015-03-31": {
+  "/2015-03-31/functions/get-metadata/invocations": {
     "target": "http://localhost:9000",
     "secure": false,
-    "changeOrigin": true
+    "pathRewrite": {
+      "^/2015-03-31/functions/get-metadata/invocations": "/2015-03-31/functions/function/invocations"
+    }
+  },
+  "/2015-03-31/functions/save-answer/invocations": {
+    "target": "http://localhost:9001",
+    "secure": false,
+    "pathRewrite": {
+      "^/2015-03-31/functions/save-answer/invocations": "/2015-03-31/functions/function/invocations"
+    }
   }
 }

@@ -8,7 +8,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint",
-    "prod:deploy": "npm run build && cd infra && npx cdk deploy ClientStack"
+    "prod:deploy": "npm run build && cd infra/server && npx cdk deploy ClientStack"
   },
   "private": true,
   "packageManager": "npm@11.12.1",

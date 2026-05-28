@@ -1,7 +1,7 @@
 services:
-  lambda-local:
+  lambda-get-metadata-local:
     image: public.ecr.aws/lambda/nodejs:24.2026.05.16.11-x86_64
-    container_name: lambda-local
+    container_name: lambda-get-metadata-local
     ports:
       - '9000:8080'
     environment:
@@ -13,6 +13,23 @@ services:
     volumes:
       - ./dist/lambda:/var/task
     command: get-metadata.handler
+    depends_on:
+      - dynamodb-local
+
+  lambda-save-answer-local:
+    image: public.ecr.aws/lambda/nodejs:24.2026.05.16.11-x86_64
+    container_name: lambda-save-answer-local
+    ports:
+      - '9001:8080'
+    environment:
+      - TABLE_NAME=AnswerTable-dev
+      - ALLOWED_ORIGIN=*
+      - AWS_REGION=ap-northeast-1
+      - DYNAMODB_ENDPOINT=http://dynamodb-local:8000
+      - ENV_TYPE=LOCAL
+    volumes:
+      - ./dist/lambda:/var/task
+    command: save-answer.handler
     depends_on:
       - dynamodb-local
 

@@ -1,19 +1,24 @@
-import * as cdk from 'aws-cdk-lib/core';
-import { Construct } from 'constructs';
+import { LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
 import { AttributeType, BillingMode, Table } from 'aws-cdk-lib/aws-dynamodb';
-import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { Runtime } from 'aws-cdk-lib/aws-lambda';
-import { Cors, LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
+import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
+import { RemovalPolicy } from 'aws-cdk-lib/core';
+import { Construct } from 'constructs';
 
-export class ServerStack extends cdk.Stack {
-  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
-    super(scope, id, props);
-
+export class MetadataService extends Construct {
+  constructor(
+    scope: Construct,
+    id: string,
+    props: {
+      api: RestApi;
+    },
+  ) {
+    super(scope, id);
     const table = new Table(this, 'FormMetadataTable', {
       tableName: process.env.TABLE_NAME ?? 'MetaFormFieldsTable',
       partitionKey: { name: 'formId', type: AttributeType.STRING },
       billingMode: BillingMode.PAY_PER_REQUEST,
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      removalPolicy: RemovalPolicy.DESTROY,
     });
 
     const getMetadataLambda = new NodejsFunction(this, 'GetMetadataHandler', {
@@ -29,15 +34,7 @@ export class ServerStack extends cdk.Stack {
 
     table.grantReadData(getMetadataLambda);
 
-    const api = new RestApi(this, 'MetaUiApi', {
-      restApiName: 'MetaUiApi-dev',
-      defaultCorsPreflightOptions: {
-        allowOrigins: [process.env.ALLOWED_ORIGIN ?? '*'],
-        allowMethods: Cors.ALL_METHODS,
-      },
-    });
-
-    const metadataResource = api.root.addResource('metadata');
+    const metadataResource = props.api.root.addResource('metadata');
     metadataResource.addMethod('GET', new LambdaIntegration(getMetadataLambda));
   }
 }

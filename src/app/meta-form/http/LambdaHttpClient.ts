@@ -33,6 +33,14 @@ const runtimeResponseToFormFields = (raw: unknown): MetaFormField[] => {
 export class LambdaHttpClient implements MetaformHttpClient {
   private readonly http = inject(HttpClient);
 
+  submit(keyAndValues: Record<MetaFormField['key'], string>) {
+    this.http
+      .post('/2015-03-31/functions/save-answer/invocations', {
+        queryStringParameters: { answers: JSON.stringify(keyAndValues) },
+      })
+      .subscribe();
+  }
+
   getFormMetadata(formId: FormId): Observable<MetaFormField[]> {
     return environment.production
       ? this.getFromMetadataInProd(formId)
@@ -41,7 +49,7 @@ export class LambdaHttpClient implements MetaformHttpClient {
 
   private getFromMetadataInLocal(formId: FormId): Observable<MetaFormField[]> {
     return this.http
-      .post('/2015-03-31/functions/function/invocations', {
+      .post('/2015-03-31/functions/get-metadata/invocations', {
         queryStringParameters: { formId },
       })
       .pipe(map((raw) => runtimeResponseToFormFields(raw)));
